@@ -5,6 +5,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  */
 public class Server {
 	public static void main(String[] args){
-	   new AnnotationConfigApplicationContext();
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+		Demo demo = (Demo)context.getBean("demo");
+		System.out.println(demo.getName());
+
 	}
 }

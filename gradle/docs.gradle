@@ -99,7 +99,7 @@ task extractDocResources(type: Copy, dependsOn: downloadResources) {
  * Produce the Spring Framework Reference documentation
  * from "src/docs/asciidoc" into  "build/asciidoc/html5"
  */
-asciidoctor {
+/*asciidoctor {
 	sources {
 		include '*.adoc'
 	}
@@ -132,9 +132,9 @@ asciidoctor {
 			stylesheet: 'stylesheet.css',
 			'spring-version': project.version
 	])
-}
+}*/
 
-asciidoctor.dependsOn extractDocResources
+//asciidoctor.dependsOn extractDocResources
 
 /**
  * Zip all docs (API and reference) into a single archive
