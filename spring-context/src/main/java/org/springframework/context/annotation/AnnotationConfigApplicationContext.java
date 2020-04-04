@@ -67,6 +67,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		//AnnotatedBeanDefinitionReade读取器用来加载class类型的配置，在
 		//它初始化的时候，会预先注册一些BeanPostProcessor和BeanFactoryPostProcessor，这些处理器会在接下来的spring初始化流程中被调用
 		this.reader = new AnnotatedBeanDefinitionReader(this);
+		//ClassPathBeanDefinitionScanner是一个扫描指定类路径中注解Bean定义的扫描器，
+		//在它初始化的时候，会初始化一些需要被扫描的注解，初始化用于加载包下的资源的Loader。
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 
@@ -81,6 +83,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	}
 
 	/**
+	 * 读取配置类
 	 * Create a new AnnotationConfigApplicationContext, deriving bean definitions
 	 * from the given component classes and automatically refreshing the context.
 	 * @param componentClasses one or more component classes &mdash; for example,
@@ -89,13 +92,15 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
 		//调用自身构造方法,主要功能为创建注解的BeanDefinition
 		this();
-		//主要功能为注册指定的组件配置类，这些类是在Application主启动类中传入的入口类，可以传入多个
+		//主要功能为注册指定的组件配置类，这些类是在Application主启动类中传入的入口类
+		//用到了AnnotatedBeanDefinitionReader读取注解的Bean读取器
 		register(componentClasses);
 		//主要功能为创建对应的bean
 		refresh();
 	}
 
 	/**
+	 * 扫描包路径
 	 * Create a new AnnotationConfigApplicationContext, scanning for components
 	 * in the given packages, registering bean definitions for those components,
 	 * and automatically refreshing the context.
@@ -103,6 +108,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext(String... basePackages) {
 		this();
+		//用到了ClassPathBeanDefinitionScanner扫描指定类路径中注解Bean定义的扫描器
+		//为这个包下面的配置类注册bean定义
 		scan(basePackages);
 		refresh();
 	}
