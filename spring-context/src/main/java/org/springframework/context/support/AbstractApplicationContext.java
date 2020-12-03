@@ -521,25 +521,30 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
-			// 这步比较关键，这步完成后，配置文件就会解析成一个个 Bean 定义，注册到 BeanFactory 中，
+			//(xml的方式获取)ClassPathXmlApplicationContext
+			// 初始化BeanFactory，然后配置文件就会解析成一个个 Bean 定义，注册到 BeanFactory 中，
 			// 当然，这里说的 Bean 还没有初始化，只是配置信息都提取出来了，
 			// 注册也只是将这些信息都保存到了注册中心(说到底核心是一个 beanName-> beanDefinition 的 map)
+			//(注解方式获取)AnnotationConfigApplicationContext
+			//只是从原来this()->初始化父类构造器生成的BeanFactory取出来
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
-			// 设置 BeanFactory 的类加载器，添加几个 BeanPostProcessor，手动注册几个特殊的 bean
+			// 为BeanFactory 设置类加载器，添加几个 BeanPostProcessor，手动注册几个特殊的 bean
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
-				// 【这里需要知道 BeanFactoryPostProcessor 这个知识点，Bean 如果实现了此接口，
-				// 那么在容器初始化以后，Spring 会负责调用里面的 postProcessBeanFactory 方法。】
-				// 这里是提供给子类的扩展点，到这里的时候，所有的 Bean 都加载、注册完成了，但是都还没有初始化
-				// 具体的子类可以在这步的时候添加一些特殊的 BeanFactoryPostProcessor 的实现类或做点什么事
+				// 这里是提供给子类的扩展点
+				//允许子类registering special BeanPostProcessors
+				//spring中并没有具体去实现postProcessBeanFactory方法，是提供给想要实现BeanPostProcessor的三方框架使用的
+				//作用是在BeanFactory准备工作完成后做一些定制化的处理，一般结合BeanPostProcessor接口的实现类一起使用，注入一些重要资源
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
-				// 调用 BeanFactoryPostProcessor 各个实现类的 postProcessBeanFactory(factory) 方法
+				// 调用 BeanFactoryPostProcessor 各个实现类的 postProcessBeanFactory(factory) 方法执行BeanFactory的后置处理器
+				// 配置类里的@bean标示的类在这注册到 BeanFactory 的beanDefinitionMap中
+				//在bean实例化之前,Spring会通过 BeanFactoryPostProcessor先进行一次回调,在此期间,还有机会修改指定的BeanDefinition
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
@@ -656,11 +661,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		// Tell the internal bean factory to use the context's class loader etc.
+		//设置bean的类加载器信息
 		beanFactory.setBeanClassLoader(getClassLoader());
 		beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
 		// Configure the bean factory with context callbacks.
+		//设置beanPostProcessor并用于上下文的回调
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
 		beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);
@@ -714,6 +721,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Must be called before singleton instantiation.
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+		// 1.getBeanFactoryPostProcessors(): 拿到当前应用上下文beanFactoryPostProcessors变量中的值
+		// 默认情况下，this.beanFactoryPostProcessors 是返回空的，可以通过customizeContext 方法（该方法是 Spring 提供给开发者的一个扩展点）
+		// 添加自定义 BeanFactoryPostProcessor 到 this.beanFactoryPostProcessors 变量中
+		// 2.invokeBeanFactoryPostProcessors: 实例化并调用所有已注册的BeanFactoryPostProcessor
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
@@ -905,6 +916,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		getLifecycleProcessor().onRefresh();
 
 		// Publish the final event.
+		//最终调用了所有实现了ApplicationListener接口的onApplicationEvent方法
 		publishEvent(new ContextRefreshedEvent(this));
 
 		// Participate in LiveBeansView MBean, if active.

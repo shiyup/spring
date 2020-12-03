@@ -90,10 +90,12 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
-		//调用自身构造方法,主要功能为创建注解的BeanDefinition
+		//这里由于他有父类，所以会先调用父类的构造方法-----初始化了DefaultListableBeanFactory
+		//调用自身构造方法,主要功能为初始化AnnotatedBeanDefinitionReader和ClassPathBeanDefinitionScanner
+		//并创建注解的BeanDefinition---将一些注解处理器注册到DefaultListableBeanFactory的beanDefinitionMap中
 		this();
 		//主要功能为注册指定的组件配置类，这些类是在Application主启动类中传入的入口类
-		//用到了AnnotatedBeanDefinitionReader读取注解的Bean读取器
+		//通过AnnotatedBeanDefinitionReader解析传入的类上的注解,将传入的类解析成BeanDefinition保存起来,用于后续的使用
 		register(componentClasses);
 		//主要功能为创建对应的bean
 		refresh();

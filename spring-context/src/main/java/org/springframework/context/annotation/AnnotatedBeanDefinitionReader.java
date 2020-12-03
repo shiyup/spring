@@ -86,9 +86,10 @@ public class AnnotatedBeanDefinitionReader {
 		Assert.notNull(environment, "Environment must not be null");
 		this.registry = registry;
 		//ConditionEvaluator完成条件注解的判断(评估)，在Spring Boot中有大量的应用
+		//后面用来判断是否已存在对应的bean，若存在则不再创建对应的bean
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, null);
 		//注册注解配置处理器
-		//这句会把一些自动注解处理器加入到AnnotationConfigApplicationContext下的BeanFactory的BeanDefinitions中
+		//这句会把一些自动注解处理器加入到AnnotationConfigApplicationContext下的BeanFactory的beanDefinitionMap中
 		//这里将AnnotationConfigApplicationContext注册为管理BeanDefinition的BeanDefinitionRegistry，
 		//也就是说，spring中bean的管理完全交给了AnnotationConfigApplicationContext
 		AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
@@ -266,14 +267,16 @@ public class AnnotatedBeanDefinitionReader {
 		}
 		//刚开始注册的时候supplier是null-不知道有什么用？
 		abd.setInstanceSupplier(supplier);
-		// 解析Scope
+		// 解析Scope ---获取该bean的作用域（单例或多例）默认为Singleton
 		ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(abd);
 		abd.setScope(scopeMetadata.getScopeName());
 		// 生成Bean的名称 一般为首字母小写（此处为AnnotationBeanNameGenerator）
 		String beanName = (name != null ? name : this.beanNameGenerator.generateBeanName(abd, this.registry));
 
-		// 设定一些注解默认值，如lazy、Primary等等
+		//设定一些注解默认值
+		//主要处理Lazy DependOn Primary Role等注解
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);
+		//判断是否传入Qualifiers相关的注解(如果没有在bean对应的类上标注注解,也支持通过注册bean时传入一些Qualifiers相关的信息来修改beanDefinition)
 		// 解析qualifiers，若有此注解  则primary都成为true了
 		if (qualifiers != null) {
 			for (Class<? extends Annotation> qualifier : qualifiers) {
@@ -294,10 +297,12 @@ public class AnnotatedBeanDefinitionReader {
 				customizer.customize(abd);
 			}
 		}
-
-		// 下面为解析Scope是否需要代理，最后把这个Bean注册进去
+		//创建对应bean的一个包装类
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(abd, beanName);
+		//判断该bean是否需要被代理，如果不需要，则直接返回默认的BeanDefinition，如果需要，则创建代理类的BeanDefinition返回(AOP相关的内容)
+		//那么后续在refresh方法中,创建对应的bean的时候,创建的就是该bean的代理类
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+		//真正注册BeanDefinition，将bean的名称和定义注册到BeanDefinitionMap中
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}
 
