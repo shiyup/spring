@@ -850,16 +850,25 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Iterate over a copy to allow for init methods which in turn register new bean definitions.
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
+		// 1.创建beanDefinitionNames的副本beanNames用于后续的遍历，以允许init等方法注册新的bean定义
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 		// Trigger initialization of all non-lazy singleton beans...
+		// 2.遍历beanNames，触发所有非懒加载单例bean的初始化
 		for (String beanName : beanNames) {
+			// 3.获取beanName对应的MergedBeanDefinition
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+			// 4.bd对应的Bean实例：不是抽象类 && 是单例 && 不是懒加载
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				// 5.判断beanName对应的bean是否为FactoryBean
 				if (isFactoryBean(beanName)) {
+					// 5.1 通过beanName获取FactoryBean实例
+					// 通过getBean(&beanName)拿到的是FactoryBean本身；通过getBean(beanName)拿到的是FactoryBean创建的Bean实例
+					// 为了区分 “FactoryBean” 和 “FactoryBean 创建的 bean 实例”，Spring 使用了 “&” 前缀
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
 						final FactoryBean<?> factory = (FactoryBean<?>) bean;
+						// 5.2 判断这个FactoryBean是否希望急切的初始化
 						boolean isEagerInit;
 						if (System.getSecurityManager() != null && factory instanceof SmartFactoryBean) {
 							isEagerInit = AccessController.doPrivileged((PrivilegedAction<Boolean>)
@@ -870,18 +879,21 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							isEagerInit = (factory instanceof SmartFactoryBean &&
 									((SmartFactoryBean<?>) factory).isEagerInit());
 						}
+						// 5.3 如果希望急切的初始化，则通过beanName获取bean实例
 						if (isEagerInit) {
 							getBean(beanName);
 						}
 					}
 				}
 				else {
+					// 6.如果beanName对应的bean不是FactoryBean，只是普通Bean，通过beanName获取bean实例
 					getBean(beanName);
 				}
 			}
 		}
 
 		// Trigger post-initialization callback for all applicable beans...
+		// 7.遍历beanNames，触发所有SmartInitializingSingleton的后初始化回调---Spring 提供的一个扩展点
 		for (String beanName : beanNames) {
 			Object singletonInstance = getSingleton(beanName);
 			if (singletonInstance instanceof SmartInitializingSingleton) {

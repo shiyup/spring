@@ -486,14 +486,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Make sure bean class is actually resolved at this point, and
 		// clone the bean definition in case of a dynamically resolved Class
 		// which cannot be stored in the shared merged bean definition.
+		// 1.解析beanName对应的Bean的类型
 		Class<?> resolvedClass = resolveBeanClass(mbd, beanName);
 		if (resolvedClass != null && !mbd.hasBeanClass() && mbd.getBeanClassName() != null) {
+			// 如果resolvedClass存在，并且mdb的beanClass类型不是Class，并且mdb的beanClass不为空（则代表beanClass存的是Class的name）,
+			// 则使用mdb深拷贝一个新的RootBeanDefinition副本，并且将解析的Class赋值给拷贝的RootBeanDefinition副本的beanClass属性，
+			// 该拷贝副本取代mdb用于后续的操作
 			mbdToUse = new RootBeanDefinition(mbd);
 			mbdToUse.setBeanClass(resolvedClass);
 		}
 
 		// Prepare method overrides.
 		try {
+			// 2.验证及准备覆盖的方法（对override属性进行标记及验证）
 			mbdToUse.prepareMethodOverrides();
 		}
 		catch (BeanDefinitionValidationException ex) {
@@ -503,7 +508,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+			// 3.实例化前的处理，给InstantiationAwareBeanPostProcessor一个机会返回代理对象来替代真正的bean实例，达到“短路”效果
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
+			// 4.如果bean不为空，则会跳过Spring默认的实例化过程，直接使用返回的bean
 			if (bean != null) {
 				return bean;
 			}
@@ -514,6 +521,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
+			// 5.创建Bean实例（真正创建Bean的方法）
 			Object beanInstance = doCreateBean(beanName, mbdToUse, args);
 			if (logger.isTraceEnabled()) {
 				logger.trace("Finished creating instance of bean '" + beanName + "'");
@@ -646,14 +654,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	@Override
 	@Nullable
 	protected Class<?> predictBeanType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
+		// 1.拿到beanName的类型
 		Class<?> targetType = determineTargetType(beanName, mbd, typesToMatch);
 		// Apply SmartInstantiationAwareBeanPostProcessors to predict the
 		// eventual type after a before-instantiation shortcut.
+		// 2.应用SmartInstantiationAwareBeanPostProcessors后置处理器，来预测实例化的最终类型，
+		// SmartInstantiationAwareBeanPostProcessors继承了InstantiationAwareBeanPostProcessor，
+		// InstantiationAwareBeanPostProcessor的postProcessBeforeInstantiation方法可以改变Bean实例的类型，
+		// 而SmartInstantiationAwareBeanPostProcessors的predictBeanType方法可以预测这个类型
 		if (targetType != null && !mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			boolean matchingOnlyFactoryBean = typesToMatch.length == 1 && typesToMatch[0] == FactoryBean.class;
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {
 					SmartInstantiationAwareBeanPostProcessor ibp = (SmartInstantiationAwareBeanPostProcessor) bp;
+					// 调用predictBeanType方法
 					Class<?> predicted = ibp.predictBeanType(targetType, beanName);
 					if (predicted != null &&
 							(!matchingOnlyFactoryBean || FactoryBean.class.isAssignableFrom(predicted))) {
@@ -1108,11 +1122,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		Object bean = null;
 		if (!Boolean.FALSE.equals(mbd.beforeInstantiationResolved)) {
 			// Make sure bean class is actually resolved at this point.
+			// 1.mbd不是合成的，并且BeanFactory中存在InstantiationAwareBeanPostProcessor
 			if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+				// 2.解析beanName对应的Bean实例的类型
 				Class<?> targetType = determineTargetType(beanName, mbd);
 				if (targetType != null) {
+					// 3.实例化前的后置处理器应用（处理InstantiationAwareBeanPostProcessor）
 					bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
 					if (bean != null) {
+						// 4.如果返回的bean不为空，会跳过Spring默认的实例化过程，
+						// 所以只能在这里调用BeanPostProcessor实现类的postProcessAfterInitialization方法
 						bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
 					}
 				}

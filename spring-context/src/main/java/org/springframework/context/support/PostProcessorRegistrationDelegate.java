@@ -234,15 +234,23 @@ final class PostProcessorRegistrationDelegate {
 		// Register BeanPostProcessorChecker that logs an info message when
 		// a bean is created during BeanPostProcessor instantiation, i.e. when
 		// a bean is not eligible for getting processed by all BeanPostProcessors.
+		//beanProcessor目标计数
 		int beanProcessorTargetCount = beanFactory.getBeanPostProcessorCount() + 1 + postProcessorNames.length;
+		// 添加BeanPostProcessorChecker(主要用于记录信息-打印bean创建的日志,并校验bean的数量等)到beanFactory中
 		beanFactory.addBeanPostProcessor(new BeanPostProcessorChecker(beanFactory, beanProcessorTargetCount));
 
 		// Separate between BeanPostProcessors that implement PriorityOrdered,
 		// Ordered, and the rest.
+		// 定义不同的变量用于区分: 实现PriorityOrdered接口的BeanPostProcessor、实现Ordered接口的BeanPostProcessor、普通BeanPostProcessor
+		// 1 priorityOrderedPostProcessors: 用于存放实现PriorityOrdered接口的BeanPostProcessor
 		List<BeanPostProcessor> priorityOrderedPostProcessors = new ArrayList<>();
+		// 2 internalPostProcessors: 用于存放Spring内部的BeanPostProcessor
 		List<BeanPostProcessor> internalPostProcessors = new ArrayList<>();
+		// 3 orderedPostProcessorNames: 用于存放实现Ordered接口的BeanPostProcessor的beanName
 		List<String> orderedPostProcessorNames = new ArrayList<>();
+		// 4 nonOrderedPostProcessorNames: 用于存放普通BeanPostProcessor的beanName
 		List<String> nonOrderedPostProcessorNames = new ArrayList<>();
+		//将实现了不同接口的类进行分发,分发到不同的集合中,然后再按照每个集合中每个类的优先级去执行回调
 		for (String ppName : postProcessorNames) {
 			if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 				BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
@@ -287,11 +295,13 @@ final class PostProcessorRegistrationDelegate {
 		registerBeanPostProcessors(beanFactory, nonOrderedPostProcessors);
 
 		// Finally, re-register all internal BeanPostProcessors.
+		// 最后, 重新注册所有内部BeanPostProcessors（相当于内部的BeanPostProcessor会被移到处理器链的末尾）
 		sortPostProcessors(internalPostProcessors, beanFactory);
 		registerBeanPostProcessors(beanFactory, internalPostProcessors);
 
 		// Re-register post-processor for detecting inner beans as ApplicationListeners,
 		// moving it to the end of the processor chain (for picking up proxies etc).
+		// 重新注册ApplicationListenerDetector（跟上面类似，主要是为了移动到处理器链的末尾）
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));
 	}
 
