@@ -3,9 +3,10 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xmlns:context="http://www.springframework.org/schema/context"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
-      <bean id="demo" class="Demo"></bean>
+      <bean id="demo" class="syp.Demo"></bean>
 	<!--与@Component加载beanDefinition的顺序不同-->
-	<!--<context:component-scan base-package="" />-->
-	<bean id="myBeanFactoryPostProcessor" class="MyBeanFactoryPostProcessor"></bean>
-	<bean id="myBeanDefinitionRegistryPostProcessor" class="MyBeanDefinitionRegistryPostProcessor"></bean>
+	<!-- component-scan包含了annotation-config的效果 -->
+	<context:component-scan base-package="syp"/>
+<!--	<bean id="myBeanFactoryPostProcessor" class="MyBeanFactoryPostProcessor"></bean>-->
+<!--	<bean id="myBeanDefinitionRegistryPostProcessor" class="MyBeanDefinitionRegistryPostProcessor"></bean>-->
 </beans>

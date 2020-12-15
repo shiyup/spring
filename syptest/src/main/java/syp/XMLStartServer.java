@@ -1,4 +1,7 @@
+package syp;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import syp.Demo;
 
 public class XMLStartServer {
 	public static void main(String[] args){

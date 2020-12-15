@@ -1,3 +1,6 @@
+package syp;
+
+import syp.myBeanPostProcessor.MyBeanDefinitionRegistryPostProcessor;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 /**如果要测试

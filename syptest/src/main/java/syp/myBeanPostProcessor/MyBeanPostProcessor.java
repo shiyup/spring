@@ -1,7 +1,10 @@
+package syp.myBeanPostProcessor;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.stereotype.Component;
+import syp.Demo;
 
 /**
  * Created by shiyuping on 2020/12/7 10:21 下午
@@ -25,7 +28,7 @@ public class MyBeanPostProcessor implements BeanPostProcessor, PriorityOrdered {
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		System.out.println("MyBeanPostProcessor#postProcessBeforeInitialization");
+		System.out.println("MyBeanPostProcessor#postProcessAfterInitialization");
 		if (bean instanceof Demo) {
 			System.out.println(beanName);
 		}

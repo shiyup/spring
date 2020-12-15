@@ -1,3 +1,5 @@
+package syp;
+
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
