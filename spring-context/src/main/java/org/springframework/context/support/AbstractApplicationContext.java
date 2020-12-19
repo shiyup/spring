@@ -514,7 +514,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
-		// 来个锁，不然 refresh() 还没结束，你又来个启动或销毁容器的操作，那不就乱套了嘛
+		// 来个锁，可能refresh() 还没结束，又来个启动或销毁容器的操作
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
 			// 准备工作，记录下容器的启动时间、标记“已启动”状态、处理配置文件中的占位符
@@ -536,15 +536,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
 				// 这里是提供给子类的扩展点
-				//允许子类registering special BeanPostProcessors
-				//spring中并没有具体去实现postProcessBeanFactory方法，是提供给想要实现BeanPostProcessor的三方框架使用的
+				//允许子类registering special BeanPostProcessors对BeanFactory进行后续处理
 				//作用是在BeanFactory准备工作完成后做一些定制化的处理，一般结合BeanPostProcessor接口的实现类一起使用，注入一些重要资源
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
 				// 调用 BeanFactoryPostProcessor 各个实现类的 postProcessBeanFactory(factory) 方法执行BeanFactory的后置处理器
-				//在bean实例化之前,Spring会通过 BeanFactoryPostProcessor先进行一次回调,在此期间,还有机会修改指定的BeanDefinition
-				//例如：配置类里的@bean标示的类通过ConfigurationClassPostProcessor在这里注册到 BeanFactory 的beanDefinitionMap中
+				// 在bean实例化之前,Spring会通过 BeanFactoryPostProcessor先进行一次回调,在此期间,还有机会修改指定的BeanDefinition
+				// 例如：配置类里的@bean标示的类通过ConfigurationClassPostProcessor在这里注册到 BeanFactory 的beanDefinitionMap中
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
@@ -553,6 +552,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
+				// 初始化消息资源 MessageSource
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
@@ -562,7 +562,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
-				// 从方法名就可以知道，典型的模板方法(钩子方法)，
+				// 模板方法，提供给子类扩展实现
 				// 具体的子类可以在这里初始化一些特殊的 Bean（在初始化 singleton beans 之前）
 				onRefresh();
 
