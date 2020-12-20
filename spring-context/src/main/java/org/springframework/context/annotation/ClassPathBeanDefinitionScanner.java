@@ -165,6 +165,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		//useDefaultFilters为true，所以此处一般都会执行
 		// 当然我们也可以设置为false，比如@ComponentScan里就可以设置为false，只扫描指定的注解/类等等
 		if (useDefaultFilters) {
+			//注册默认的filter
 			registerDefaultFilters();
 		}
 		//设置环境

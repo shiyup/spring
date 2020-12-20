@@ -163,12 +163,15 @@ public abstract class BeanDefinitionReaderUtils {
 
 		// Register bean definition under primary name.
 		String beanName = definitionHolder.getBeanName();
+		// 注册beanName、BeanDefinition到缓存中（核心逻辑）,实现类为; DefaultListableBeanFactory
 		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
 
 		// Register aliases for bean name, if any.
+		// 注册bean名称的别名（如果有的话
 		String[] aliases = definitionHolder.getAliases();
 		if (aliases != null) {
 			for (String alias : aliases) {
+				// 注册bean的beanName和对应的别名映射到缓存中（缓存：aliasMap）
 				registry.registerAlias(beanName, alias);
 			}
 		}
