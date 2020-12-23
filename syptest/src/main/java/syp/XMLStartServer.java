@@ -9,5 +9,8 @@ public class XMLStartServer {
 		Demo demo = (Demo)context.getBean("demo");
 		System.out.println(demo.getName());
 
+		//触发容器销毁
+		context.close();
+
 	}
 }
