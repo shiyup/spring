@@ -12,10 +12,10 @@ public class A {
 	@Autowired
 	private B b;
 
-	private C c;
+	/*private C c;
 
 	@Autowired
 	public A(C c){
 		this.c = c;
-	}
+	}*/
 }

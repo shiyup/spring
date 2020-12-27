@@ -16,6 +16,7 @@ public class TestAwareBean implements InstantiationAwareBeanPostProcessor {
 	 */
 	@Override
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
+		System.out.println("TestAwareBean#postProcessBeforeInstantiation 在bean实例化前被调用");
 		return null;
 	}
 
@@ -28,7 +29,8 @@ public class TestAwareBean implements InstantiationAwareBeanPostProcessor {
 	 */
 	@Override
 	public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
-		return false;
+		System.out.println("TestAwareBean#postProcessAfterInstantiation 在bean实例化后被调用，判断bean是否需要被自动注入属性");
+		return true;
 	}
 
 	/**
@@ -41,6 +43,7 @@ public class TestAwareBean implements InstantiationAwareBeanPostProcessor {
 	 */
 	@Override
 	public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) throws BeansException {
+		System.out.println("TestAwareBean#postProcessProperties 进行属性填充前的再次处理");
 		return null;
 	}
 
@@ -54,7 +57,8 @@ public class TestAwareBean implements InstantiationAwareBeanPostProcessor {
 	 */
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		return null;
+		System.out.println("TestAwareBean#postProcessBeforeInitialization 初始化前回调");
+		return bean;
 	}
 
 	/**
@@ -66,6 +70,7 @@ public class TestAwareBean implements InstantiationAwareBeanPostProcessor {
 	 */
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		return null;
+		System.out.println("TestAwareBean#postProcessAfterInitialization 初始化后回调");
+		return bean;
 	}
 }

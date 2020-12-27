@@ -1,5 +1,6 @@
 package syp.circularReference;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -7,4 +8,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class B {
+	@Autowired
+	private A a;
 }

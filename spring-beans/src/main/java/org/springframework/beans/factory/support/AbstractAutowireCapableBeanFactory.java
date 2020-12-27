@@ -998,7 +998,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
 		Object exposedObject = bean;
-		// 1.如果bean不为空 && mbd不是合成 && 存在InstantiationAwareBeanPostProcessors
+		// 1.mbd不是合成 && 存在InstantiationAwareBeanPostProcessors
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				// 2.应用所有SmartInstantiationAwareBeanPostProcessor，调用getEarlyBeanReference方法

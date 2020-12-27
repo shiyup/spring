@@ -9,7 +9,7 @@ import syp.Demo;
 /**
  * Created by shiyuping on 2020/12/7 10:21 下午
  */
-@Component
+//@Component
 public class MyBeanPostProcessor implements BeanPostProcessor, PriorityOrdered {
 
 	@Override

@@ -908,7 +908,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.
-		// 1.初始化此上下文的转换服务
+		// 1.初始化此上下文的转换服务 影响bean类型转换属性转换
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
 			beanFactory.setConversionService(
@@ -918,19 +918,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Register a default embedded value resolver if no bean post-processor
 		// (such as a PropertyPlaceholderConfigurer bean) registered any before:
 		// at this point, primarily for resolution in annotation attribute values.
-		// 2.如果beanFactory之前没有注册嵌入值解析器，则注册默认的嵌入值解析器：主要用于注解属性值的解析。
+		// 2.如果beanFactory之前没有注册嵌入值解析器，则注册默认的嵌入值解析器：主要用于注解属性值的解析--占位符。
 		if (!beanFactory.hasEmbeddedValueResolver()) {
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
 
 		// Initialize LoadTimeWeaverAware beans early to allow for registering their transformers early.
-		// 3.初始化LoadTimeWeaverAware Bean实例对象
+		// 3.初始化LoadTimeWeaverAware Bean实例对象--aop
 		String[] weaverAwareNames = beanFactory.getBeanNamesForType(LoadTimeWeaverAware.class, false, false);
 		for (String weaverAwareName : weaverAwareNames) {
 			getBean(weaverAwareName);
 		}
 
 		// Stop using the temporary ClassLoader for type matching.
+		// 会存在两个ClassLoader，一个BeanClassLoader(主),一个临时的(aop时临时的创建ClassLoader帮助我们创建一些中间的ClassLoader)
 		beanFactory.setTempClassLoader(null);
 
 		// Allow for caching all bean definition metadata, not expecting further changes.
@@ -949,6 +950,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void finishRefresh() {
 		// Clear context-level resource caches (such as ASM metadata from scanning).
+		//清除ResourceLoader缓存
 		clearResourceCaches();
 
 		// Initialize lifecycle processor for this context.
@@ -958,7 +960,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		initLifecycleProcessor();
 
 		// Propagate refresh to lifecycle processor first.
-		// 首先将刷新完毕事件传播到生命周期处理器（触发isAutoStartup方法返回true的SmartLifecycle的start方法）
+		// 首先将刷新完毕事件传播到生命周期处理器（触发isAutoStartup方法为true条件下的SmartLifecycle的start方法）
 		getLifecycleProcessor().onRefresh();
 
 		// Publish the final event.
@@ -966,6 +968,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		publishEvent(new ContextRefreshedEvent(this));
 
 		// Participate in LiveBeansView MBean, if active.
+		//向JMX(Java Management Extensions，即Java管理扩展)里的MBeanServer托管LiveBeans---可以用Jconsole命令打开看到
 		LiveBeansView.registerApplicationContext(this);
 	}
 
