@@ -1,6 +1,7 @@
 package syp.circularReference;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,8 +14,8 @@ public class C {
 
 	public C(){}
 
-	//@Autowired
-	public C(A a){
+	@Autowired
+	public C(@Lazy A a){
 		this.a = a;
 	}
 }

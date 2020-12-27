@@ -54,11 +54,12 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 */
 	String SCOPE_PROTOTYPE = ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
-
+	// 标识 Bean 的类别
 	/**
 	 * Role hint indicating that a {@code BeanDefinition} is a major part
 	 * of the application. Typically corresponds to a user-defined bean.
 	 */
+	// 用户定义的 Bean
 	int ROLE_APPLICATION = 0;
 
 	/**
@@ -70,6 +71,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * {@link org.springframework.beans.factory.parsing.ComponentDefinition},
 	 * but not when looking at the overall configuration of an application.
 	 */
+	// 来源于配置文件的 Bean
 	int ROLE_SUPPORT = 1;
 
 	/**
@@ -78,11 +80,12 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * used when registering beans that are completely part of the internal workings
 	 * of a {@link org.springframework.beans.factory.parsing.ComponentDefinition}.
 	 */
+	//Spring 内部的 Bean
 	int ROLE_INFRASTRUCTURE = 2;
 
 
 	// Modifiable attributes
-
+	// Bean 的父类名称
 	/**
 	 * Set the name of the parent definition of this bean definition, if any.
 	 */
@@ -146,6 +149,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 */
 	boolean isLazyInit();
 
+	// 当前 Bean 所依赖的其它 Bean 名称
 	/**
 	 * Set the names of the beans that this bean depends on being initialized.
 	 * The bean factory will guarantee that these beans get initialized first.
@@ -158,6 +162,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	@Nullable
 	String[] getDependsOn();
 
+	// Bean 是否可以自动注入 只对 @Autowired 注解有效
 	/**
 	 * Set whether this bean is a candidate for getting autowired into some other bean.
 	 * <p>Note that this flag is designed to only affect type-based autowiring.
@@ -172,6 +177,8 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 */
 	boolean isAutowireCandidate();
 
+	// 当前 Bean 是否为主要候选 Bean 。
+	// 当同一个接口有多个实现类时，通过该属性来配置某个 Bean 为主候选 Bean。
 	/**
 	 * Set whether this bean is a primary autowire candidate.
 	 * <p>If this value is {@code true} for exactly one bean among multiple
@@ -184,6 +191,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 */
 	boolean isPrimary();
 
+	// 创建该 Bean 的工厂类
 	/**
 	 * Specify the factory bean to use, if any.
 	 * This the name of the bean to call the specified factory method on.
@@ -197,6 +205,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	@Nullable
 	String getFactoryBeanName();
 
+	// 创建该 Bean 的工厂方法
 	/**
 	 * Specify a factory method, if any. This method will be invoked with
 	 * constructor arguments, or with no arguments if none are specified.
@@ -213,6 +222,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	@Nullable
 	String getFactoryMethodName();
 
+	// 返回该 Bean 构造方法参数值、所有属性
 	/**
 	 * Return the constructor argument values for this bean.
 	 * <p>The returned instance can be modified during bean factory post-processing.
@@ -233,6 +243,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * <p>The returned instance can be modified during bean factory post-processing.
 	 * @return the MutablePropertyValues object (never {@code null})
 	 */
+	// Bean 中的属性值，后面给 bean 注入属性值的时候会用到
 	MutablePropertyValues getPropertyValues();
 
 	/**
