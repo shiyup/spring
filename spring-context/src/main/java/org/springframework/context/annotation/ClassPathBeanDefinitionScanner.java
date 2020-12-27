@@ -289,7 +289,6 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 				// 生成Bean的名称，默认为首字母小写
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
 				// 此处为扫描的Bean，为ScannedGenericBeanDefinition，所以肯定为true
-				// 因此进来，执行postProcessBeanDefinition（对Bean定义信息做）   如下详解
 				// 注意：只是添加些默认的Bean定义信息，并不是执行后置处理器~~~
 				if (candidate instanceof AbstractBeanDefinition) {
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
@@ -300,7 +299,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
 				//检查这个Bean  比如
-				//如果dao包（一般配置的basePakage是这个）下的类是符合mybaits要求的则向spring IOC容器中注册它的BeanDefinition
+				//如果dao包（一般配置的basePackage是这个）下的类是符合mybatis要求的则向spring IOC容器中注册它的BeanDefinition
 				//所以这步检查第三方Bean的时候有必要检查一下
 				if (checkCandidate(beanName, candidate)) {
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);

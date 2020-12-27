@@ -98,7 +98,7 @@ final class PostProcessorRegistrationDelegate {
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			//遍历所有beanName,并将实现了PriorityOrdered接口的BeanDefinitionRegistryPostProcessor先加到RegistryProcessors中
-			//实现PriorityOrdered接口主要是用来排序用的，重写一个返回订单值的接口通过这个订单值来比较，订单值越高优先级越低
+			//实现PriorityOrdered接口主要是用来排序用的，优先级大于实现了Ordered接口的，重写一个返回订单值的接口通过这个订单值来比较，订单值越高优先级越低
 			for (String ppName : postProcessorNames) {
 				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 					//通过bean的名称和类型注册并实例化相关的BeanDefinitionRegistry后置处理器
