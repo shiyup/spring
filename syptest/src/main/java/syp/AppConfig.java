@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AppConfig {
-	@Bean("demo")
+	@Bean("demo" )
 	public Demo getDemo(){
 		return new Demo();
 	}

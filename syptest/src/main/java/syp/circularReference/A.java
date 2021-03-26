@@ -15,8 +15,8 @@ public class A {
 
 	private C c;
 
-	@Autowired
-	public A(C c){
+	/*@Autowired
+	public A(@Lazy C c){
 		this.c = c;
-	}
+	}*/
 }

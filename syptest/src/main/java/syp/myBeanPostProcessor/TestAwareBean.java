@@ -5,7 +5,7 @@ import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class TestAwareBean implements InstantiationAwareBeanPostProcessor {
 	/**
 	 * 顺序1，在bean实例化前被调用
